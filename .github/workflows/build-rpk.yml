@@ -1,0 +1,31 @@
+name: Build Baby Milk RPK
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'baby-milk-vela-v1.1-source.zip'
+      - '.github/workflows/build-rpk.yml'
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Extract source
+        run: unzip -q baby-milk-vela-v1.1-source.zip -d project
+      - name: Install dependencies
+        working-directory: project/baby-milk-vela
+        run: npm install
+      - name: Build RPK
+        working-directory: project/baby-milk-vela
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Baby-Milk-RPK
+          path: project/baby-milk-vela/dist/*.rpk
+          if-no-files-found: error
